@@ -1,80 +1,82 @@
-
-// Масив для збереження записів (in-memory)
-let products = [];
+const state = {
+  products: [],
+  nextId: 1
+};
 
 // Знаходимо форму та таблицю
 const form = document.getElementById("createForm");
 const tableBody = document.getElementById("itemsTableBody");
 const resetBtn = document.getElementById("resetBtn");
 
-// Обробка сабміту (натискання кнопки "Додати")
-form.addEventListener("submit", function(event) {
-  event.preventDefault(); // щоб сторінка не перезавантажувалась
-
   // Зчитуємо значення полів
-  const name = document.getElementById("nameInput").value.trim();
-  const license = document.getElementById("licenseSelect").value;
-  const user = document.getElementById("userInput").value.trim();
-  const date = document.getElementById("dateInput").value;
-  const comment = document.getElementById("commentInput").value.trim();
+  function readForm() {
+  return {
+    id: state.nextId++,
+    name: document.getElementById("nameInput").value.trim(),
+    license: document.getElementById("licenseSelect").value,
+    user: document.getElementById("userInput").value.trim(),
+    date: document.getElementById("dateInput").value,
+  comment: document.getElementById("commentInput").value.trim()
+  };
+}
+function showError(errorId, message, inputId) {
+  document.getElementById(errorId).textContent = message;
+  document.getElementById(inputId).classList.add("invalid");
+}
 
+function clearErrors() {
+  document.querySelectorAll(".error-text").forEach(el => el.textContent = "");
+  document.querySelectorAll("input, select, textarea")
+    .forEach(el => el.classList.remove("invalid"));
+}
   // Мінімальна валідація
+  function validateForm(data) {
   let valid = true;
+  clearErrors();
 
-  if (!name) {
-    document.getElementById("nameError").textContent = "Назва обов'язкова";
+  if (!data.name) {
+    showError("nameError", "Назва обов'язкова", "nameInput");
     valid = false;
   } else {
     document.getElementById("nameError").textContent = "";
   }
 
-  if (!license) {
-    document.getElementById("licenseError").textContent = "Оберіть ліцензію";
+  if (!data.license) {
+    showError("licenseError", "Оберіть ліцензію", "licenseSelect");
     valid = false;
   } else {
     document.getElementById("licenseError").textContent = "";
   }
 
-  if (!user) {
-    document.getElementById("userError").textContent = "Користувач обов'язковий";
+  if (!data.user) {
+    showError("userError", "Користувач обов'язковий", "userInput");
     valid = false;
-  } else if(!user.includes("@")) {
-    document.getElementById("userError").textContent = "Введіть коректну електронну адресу";
+  } else if(!data.user.includes("@")) {
+    showError("userError", "Введіть коректну електронну адресу", "userInput");
     valid = false;
   } else {
     document.getElementById("userError").textContent = "";
   }
  
-
-  if (!date) {
-    document.getElementById("dateError").textContent = "Дата обов'язкова";
+  if (!data.date) {
+    showError("dateError", "Дата обов'язкова", "dateInput");
     valid = false;
   } else {
     document.getElementById("dateError").textContent = "";
   }
 
-  // Якщо є помилки — не додаємо запис
-  if (!valid) return;
+  return valid;
+ }
 
-  // Додаємо запис у масив
-  products.push({ name, license, user, date, comment });
+function addItem(item) {
+ state.products.push(item);
+}
 
-  // Перемальовуємо таблицю
-  renderTable();
-
-  // Очищаємо форму після додавання
-  form.reset();
-});
-
-// Кнопка "Очистити" просто очищає форму
-resetBtn.addEventListener("click", function() {
-  form.reset();
-});
 
 // Функція для оновлення таблиці
 function renderTable() {
-  tableBody.innerHTML = ""; // очистити попередні рядки
-  products.forEach((p, index) => {
+  tableBody.innerHTML = ""; 
+  state.products.forEach((p, index) => {
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${index + 1}</td>
@@ -83,9 +85,32 @@ function renderTable() {
       <td>${p.user}</td>
       <td>${p.date}</td>
       <td>${p.comment}</td>
+      <td><button class = "deleteBtn" data-id = "${p.id}">Видалити</button></td>
     `;
     tableBody.appendChild(row);
   });
 }
+   form.addEventListener("submit", function(event) {
+  event.preventDefault();
+  const data = readForm();
 
+  if (validateForm(data)) {
+    addItem(data);
+    renderTable();
+    form.reset();
+    clearErrors();
+  }
+});
 
+resetBtn.addEventListener("click", function() {
+  form.reset();
+  clearErrors();
+});
+
+tableBody.addEventListener("click", function(event) {
+  if (event.target.classList.contains("deleteBtn")) {
+    const id = Number(event.target.dataset.id);
+    state.products = state.products.filter(p => p.id !== id);
+    renderTable();
+  }
+});

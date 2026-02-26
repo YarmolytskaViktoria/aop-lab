@@ -16,18 +16,15 @@
         </header>
 
         <main class="flexbox">
-            <!-- Ліва частина: форма -->
             <section class="createsection">
                 <h2>Додати продукт</h2>
                 <form id="createForm" novalidate>
-                    <!-- Поле 1: Назва -->
                     <div class="field">
                         <label for="nameInput">Назва продукту</label>
                         <input id="nameInput" type="text" required minlength="3" />
                         <p class="error-text" id="nameError"></p>
                     </div>
-
-                    <!-- Поле 2: Ліцензія -->
+                    
                     <div class="field">
                         <label for="licenseSelect">Тип ліцензії</label>
                         <select id="licenseSelect" required>
@@ -39,10 +36,9 @@
                         <p class="error-text" id="licenseError"></p>
                     </div>
 
-
                     <div class="field">
                         <label for="userInput">Користувач</label>
-                        <input id="userInput" type="email" required />
+                        <input id="userInput" type="email" placeholder="user@gmail.com" required/>
                         <p class="error-text" id="userError"></p>
                     </div>
 
@@ -76,6 +72,7 @@
                             <th>Користувач</th>
                             <th>Дата</th>
                             <th>Коментар</th>
+                            <th>Дії</th>
                         </tr>
                     </thead>
                     <tbody id="itemsTableBody">

@@ -64,3 +64,9 @@ th {
   background: #eee;
 }
 
+input.invalid,
+select.invalid {
+  border-color: #c00 !important;
+  background-color: #ffe6e6 !important;
+}
+
